@@ -32,15 +32,15 @@
     <profiles>
         <profile>
             <id>scala-2.8.1</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <properties>
                 <scala.version>2.8.1</scala.version>
             </properties>
         </profile>
         <profile>
             <id>scala-2.9.0</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <properties>
                 <scala.version>2.9.0</scala.version>
             </properties>
@@ -182,6 +182,18 @@
         </executions>
 
     </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
     </plugins>
   </build>
 </project>

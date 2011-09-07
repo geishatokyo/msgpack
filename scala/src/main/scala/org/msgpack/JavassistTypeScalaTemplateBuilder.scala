@@ -472,7 +472,6 @@ class ScalaFieldEntryReader extends IFieldEntryReader{
         }
       }
     }
-
     for( i <- 0 until indexed.length ){
       if(indexed(i) == null){
         indexed(i) = notIndexed.head
