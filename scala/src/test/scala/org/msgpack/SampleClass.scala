@@ -102,3 +102,30 @@ class FieldOrder{
   override def toString = "hogehoge"
 
 }
+
+trait OnlyDef[T]{
+  def id : T
+}
+@MessagePackMessage
+class WithConstructor(var id : Long , var name : String , var desc : String) extends OnlyDef[Long]{
+
+  def this() = this(0,"no name","no desc")
+
+}
+
+@MessagePackMessage
+class OverloadVars{
+
+  def id_=( v : String) = _id = v.toLong
+
+  private var _id : Long = 0
+
+  def id_=( v : Long) = _id = v
+
+  def id : Long = _id
+
+  def id_=(obj : Any) = _id = obj.toString.toLong
+
+
+
+}

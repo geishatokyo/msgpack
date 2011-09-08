@@ -84,6 +84,28 @@ class ScalaMessagePackTest extends Specification with JUnit /*with ScalaCheck*/ 
       conv.name must be_==(sc.name)
     }
 
+    "pack and unpack constructor defined var class" in {
+      val v = new WithConstructor(234,"tom","No, it is a pen.")
+
+      val b = ScalaMessagePack.pack(v)
+      val deser = ScalaMessagePack.unpack[WithConstructor](b)
+
+      deser.id must_== v.id
+      deser.name must_== v.name
+      deser.desc must_== v.desc
+
+    }
+
+    "pack and unpack overloaded class" in {
+      val v = new OverloadVars()
+      v.id = 43829
+
+      val b = ScalaMessagePack.pack(v)
+      val deser = ScalaMessagePack.unpack[OverloadVars](b)
+
+      deser.id must_== v.id
+
+    }
 
   }
 

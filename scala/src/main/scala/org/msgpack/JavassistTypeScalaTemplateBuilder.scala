@@ -340,13 +340,16 @@ class ScalaFieldEntryReader extends IFieldEntryReader{
 
 
   def setter_?(method : Method) : Boolean = {
+    val name = method.getName
     Modifier.isPublic(method.getModifiers) &&
     method.getReturnType.getName == "void" &&
-    method.getName.endsWith("_$eq") &&
+    !name.startsWith("_") &&
+    name.endsWith("_$eq") &&
     method.getParameterTypes.length == 1
   }
 
   def getter_?(method : Method) : Boolean = {
+    !method.getName.startsWith("_") &&
     Modifier.isPublic(method.getModifiers) &&
     method.getReturnType.getName != "void" &&
     method.getParameterTypes.length == 0
@@ -367,9 +370,11 @@ class ScalaFieldEntryReader extends IFieldEntryReader{
     //Find getters and setters
     for( m <- targetClass.getMethods){
       if(setter_?(m)){
-        setters +=(extractName(m.getName) -> m)
+        val valType = m.getParameterTypes()(0).getName
+        setters +=( (extractName(m.getName) + ":" + valType) -> m)
       }else if(getter_?(m)){
-        getters +=(m.getName -> m)
+        val valType = m.getReturnType.getName
+        getters +=( (m.getName + ":" + valType) -> m)
       }
     }
 
@@ -429,12 +434,12 @@ class ScalaFieldEntryReader extends IFieldEntryReader{
       }
       for(f <- clazz.getDeclaredFields){
         val name =f.getName
-        getterAndSetter(name) match{
+        getterAndSetter(name + ":" + f.getType().getName()) match{
           case Some((g,s)) => props +=( name -> (g,s,f))
           case None => {
             if(name.startsWith("_")){
               val sname = name.substring(1)
-              getterAndSetter(sname) match{
+              getterAndSetter(sname + ":" + f.getType().getName()) match{
                 case Some((g,s)) => props +=( sname -> (g,s,f))
                 case None =>
               }
