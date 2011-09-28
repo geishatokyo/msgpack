@@ -49,6 +49,15 @@ public class BuilderSelectorRegistry {
 	private BuilderSelectorRegistry(){
 	}
 
+    /**
+     * Do not use except debug or test.
+     */
+    @Deprecated
+    public static void reset(){
+        instance = new BuilderSelectorRegistry();
+        initForJava();
+    }
+
 	/**
 	 * initialize BuilderSelectors for basic java enviroment.
 	 */

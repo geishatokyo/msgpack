@@ -14,8 +14,7 @@ import java.util.Map;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matcher;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 
 import org.msgpack.MessagePack;
 import org.msgpack.MessagePackable;
@@ -37,13 +36,13 @@ import org.msgpack.template.builder.AnnotationTemplateBuilderSelector;
 import org.msgpack.template.builder.ReflectionTemplateBuilder;
 import org.msgpack.template.builder.TemplateBuilder;
 
-import org.junit.Assert;
 import junit.framework.TestCase;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 
 public class TestReflectionTemplateBuilderJavaBeansPackUnpack extends TestCase {
-	static {
+
+    static {
 		//Replace template selectors from javassist to reflection.
 		BuilderSelectorRegistry instance = BuilderSelectorRegistry.getInstance();
 
@@ -81,7 +80,11 @@ public class TestReflectionTemplateBuilderJavaBeansPackUnpack extends TestCase {
 		MessagePack.register(OptionalBaseMessagePackableUnpackableClass.class);
 		MessagePack.register(OptionalMessagePackableUnpackableClass.class);
 	}
-	
+    @AfterClass
+    public static void afterClass(){
+        BuilderSelectorRegistry.reset();
+    }
+
 	Matcher<Object> beansEquals(Object actual){
 		return new BeansEquals(actual); 
 	}

@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.AfterClass;
 import org.junit.Test;
 
 import org.msgpack.MessagePack;
@@ -77,6 +78,11 @@ public class TestReflectionTemplateBuilderPackUnpack extends TestCase {
 		MessagePack.register(OptionalBaseMessagePackableUnpackableClass.class);
 		MessagePack.register(OptionalMessagePackableUnpackableClass.class);
 	}
+
+    @AfterClass
+    public static void afterClass(){
+        BuilderSelectorRegistry.reset();
+    }
 
 	@Test
 	public void testPrimitiveTypeFields00() throws Exception {
