@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.lang.reflect.Type;
 import java.lang.reflect.ParameterizedType;
 import org.msgpack.template.builder.BuilderSelectorRegistry;
+import org.msgpack.template.builder.CurrentBuilding;
 import org.msgpack.template.builder.CustomTemplateBuilder;
 import org.msgpack.template.builder.TemplateBuilder;
 import org.msgpack.Template;
@@ -61,7 +62,7 @@ public class TemplateRegistry {
 		if (builder != null && builder instanceof CustomTemplateBuilder) {
 			register(target, ((CustomTemplateBuilder)builder).buildTemplate(target, flist));
 		} else {
-			throw new TemplateBuildException("Cannot build template with filed list");
+			throw new TemplateBuildException("Cannot build template with field list");
 		}
 	}
 
@@ -106,8 +107,12 @@ public class TemplateRegistry {
 
 	private static synchronized Template lookupImpl(Type targetType,
 			boolean forceLoad, boolean forceBuild, boolean fallbackDefault) {
-		Template tmpl;
 
+		Template tmpl;
+        if(CurrentBuilding.isBuilding(targetType)){
+            tmpl = LazyBindTemplate.getLazyBindTemplate(targetType);
+            return tmpl;
+        }
 		if(targetType instanceof ParameterizedType) {
 			// ParameterizedType is not a Class<?>?
 			tmpl = lookupGenericImpl((ParameterizedType)targetType);
@@ -126,15 +131,25 @@ public class TemplateRegistry {
 		TemplateBuilder builder = BuilderSelectorRegistry.getInstance().select(targetType);
 		if (builder != null) {
 			if (forceLoad) {
-				tmpl = builder.loadTemplate(targetType);
+                CurrentBuilding.beginBuilding(targetType);
+                try{
+				    tmpl = builder.loadTemplate(targetType);
+                }finally{
+                    CurrentBuilding.endBuilding(targetType);
+                }
 				if (tmpl != null) {
 					register(targetType, tmpl);
 					return tmpl;
 				}
 			}
 
-			tmpl = builder.buildTemplate(targetType);
-			if (tmpl != null) {
+            CurrentBuilding.beginBuilding(targetType);
+            try{
+                tmpl = builder.buildTemplate(targetType);
+            }finally{
+                CurrentBuilding.endBuilding(targetType);
+            }
+            if (tmpl != null) {
 				register(targetType, tmpl);
 				return tmpl;
 			}
@@ -161,9 +176,14 @@ public class TemplateRegistry {
 			}
 
 			if(forceBuild) {
-				tmpl = builderSelectorRegistry.getForceBuilder().buildTemplate(target);
-				register(target, tmpl);
-				return tmpl;
+                CurrentBuilding.beginBuilding(targetType);
+                try{
+                    tmpl = builderSelectorRegistry.getForceBuilder().buildTemplate(target);
+                }finally{
+                    CurrentBuilding.endBuilding(targetType);
+                }
+                register(target, tmpl);
+                return tmpl;
 			}
 		}
 

@@ -140,23 +140,21 @@ public class JavassistTemplateBuilder extends CustomTemplateBuilder {
 		//		f.setAccessible(true);
 		//	}
 		//}
-		Template[] tmpls = toTemplate(targetClass,entries);
-		BuildContextBase bc = getBuildContextFacotry().createBuildContext(this);
-		return bc.buildTemplate(targetClass, entries, tmpls);
-	}
+        Template[] tmpls = toTemplate(entries);
+        BuildContextBase bc = getBuildContextFacotry().createBuildContext(this);
+        return bc.buildTemplate(targetClass, entries, tmpls);
+    }
 
-	private static Template[] toTemplate(Class<?> targetClass,IFieldEntry[] from) {
+	private static Template[] toTemplate(IFieldEntry[] from) {
 		Template[] tmpls = new Template[from.length];
 		for(int i=0; i < from.length; i++) {
 			IFieldEntry e = from[i];
 			if(!e.isAvailable()) {
 				tmpls[i] = null;
-			} else if(!e.getType().isAssignableFrom(targetClass) ){//!targetClass.isAssignableFrom(e.getType())){
+			} else{//!targetClass.isAssignableFrom(e.getType())){
 				Template tmpl = TemplateRegistry.lookup(e.getGenericType(), true);
 				tmpls[i] = tmpl;
-			} else{
-                tmpls[i] = SelfTypeTemplate.getSelfTypeTemplate(targetClass);
-            }
+			}
 		}
 		return tmpls;
 	}
@@ -180,11 +178,11 @@ public class JavassistTemplateBuilder extends CustomTemplateBuilder {
 		writeTemplate(targetClass, entries, directoryName);
 	}
 
-	private void writeTemplate(Class<?> targetClass, IFieldEntry[] entries, String directoryName) {
-		Template[] tmpls = toTemplate(targetClass,entries);
-		BuildContextBase bc = getBuildContextFacotry().createBuildContext(this);
-		bc.writeTemplate(targetClass, entries, tmpls, directoryName);
-	}
+    private void writeTemplate(Class<?> targetClass, IFieldEntry[] entries, String directoryName) {
+        Template[] tmpls = toTemplate(entries);
+        BuildContextBase bc = getBuildContextFacotry().createBuildContext(this);
+        bc.writeTemplate(targetClass, entries, tmpls, directoryName);
+    }
 
 	@Override
 	public Template loadTemplate(Type targetType) {
@@ -197,9 +195,9 @@ public class JavassistTemplateBuilder extends CustomTemplateBuilder {
 	}
 
 	private Template loadTemplate(Class<?> targetClass, IFieldEntry[] entries) {
-		Template[] tmpls = toTemplate(targetClass,entries);
-		BuildContextBase bc = getBuildContextFacotry().createBuildContext(this);
-		return bc.loadTemplate(targetClass, entries, tmpls);
-	}
+        Template[] tmpls = toTemplate(entries);
+        BuildContextBase bc = getBuildContextFacotry().createBuildContext(this);
+        return bc.loadTemplate(targetClass, entries, tmpls);
+    }
 }
 
